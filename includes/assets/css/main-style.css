@@ -1,0 +1,60 @@
+#user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 20px;
+}
+
+.user-details {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.user-avatar {
+  width: 40px; /* Adjust the size of the avatar */
+  height: 40px; /* Maintain a square aspect ratio */
+  border-radius: 50% !important; /* Circular shape */
+  margin-right: 10px; /* Space between avatar and username */
+  border: 2px solid #ddd; /* Add a subtle border around the avatar */
+  object-fit: cover; /* Make sure the image fits well in the circle */
+}
+
+.user-name {
+  font-weight: bold;
+  color: #333;
+  margin-right: 10px; /* Space between username and logout button */
+}
+
+.logout-button {
+  width: 40px; /* Set a fixed width */
+  height: 40px; /* Set a fixed height to maintain the circular shape */
+  border-radius: 50%; /* Ensures the button is fully circular */
+  background-color: #ffee13;
+  color: black;
+  border: none;
+  cursor: pointer;
+  display: flex; /* Flexbox to center the icon */
+  align-items: center; /* Vertically center the icon */
+  justify-content: center; /* Horizontally center the icon */
+  font-size: 18px; /* Set icon size */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Optional shadow for better visibility */
+  transition: background-color 0.3s ease;
+  object-fit: contain; /* Ensure the icon fits within the circle */
+}
+
+.logout-button i {
+  font-size: 18px; /* Adjust icon size */
+  margin: 0; /* Remove any margin around the icon */
+  color: #555;
+}
+
+.logout-button:hover {
+  background-color: #e9db16; /* Darker yellow on hover */
+}
+
+#steam-id {
+  font-size: 14px;
+  color: #555;
+}
