@@ -13,7 +13,9 @@ add_action('wp_enqueue_scripts', 'steam_login_enqueue_scripts');
 // Create a shortcode for Steam login button
 function steam_login_button_shortcode()
 {
-    return '<a href="#" id="steam-login-button">Login with Steam</a>';
+    return '<div id="login-btn-container">
+    <a href="#" id="steam-login-button">Login with Steam</a>
+    </div>';
 }
 add_shortcode('steam_login_button', 'steam_login_button_shortcode');
 

@@ -1,8 +1,7 @@
 #user-info {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  margin-top: 20px;
+  align-items: center;
 }
 
 .user-details {
@@ -25,6 +24,12 @@
   font-weight: bold;
   color: #333;
   margin-right: 10px; /* Space between username and logout button */
+}
+
+#login-btn-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .logout-button {
@@ -57,4 +62,26 @@
 #steam-id {
   font-size: 14px;
   color: #555;
+}
+
+/* Media Query for Mobile Devices */
+@media (max-width: 768px) {
+  #user-details {
+    justify-content: center; /* Center align for smaller screens */
+    flex-wrap: nowrap; /* Keep all elements on a single line */
+  }
+
+  .user-avatar {
+    width: 40px; /* Adjust avatar size for smaller screens */
+    height: 40px;
+  }
+
+  .logout-button {
+    width: 36px;
+    height: 36px; /* Adjust button size for smaller screens */
+  }
+
+  .user-name {
+    font-size: 14px; /* Slightly smaller username font */
+  }
 }
