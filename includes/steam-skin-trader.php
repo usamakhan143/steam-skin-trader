@@ -2,6 +2,22 @@
 
 function steam_login_enqueue_scripts()
 {
+    // Enqueue Styles
+    wp_enqueue_style(
+        'steam-skin-trader-bootstrap5',
+        'https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css',
+        array(),
+        '5.0.2'
+    );
+
+    wp_enqueue_script(
+        'steam-skin-trader-jquery', // Handle name for your script
+        STEAM_PLUGIN_URL . 'node_modules/jquery/dist/jquery.min.js', // Path to your custom jQuery file
+        array(), // Dependencies, leave empty if none
+        '1.0.0', // Version number, update as needed
+        true // Load in the footer
+    );
+
     wp_enqueue_script('jquery');
     wp_enqueue_script('steam-login-js', plugins_url('assets/js/steam-login.js', __FILE__), array('jquery'), null, true);
     wp_localize_script('steam-login-js', 'steamLogin', array(
@@ -75,3 +91,59 @@ function steam_load_font_awesome()
     wp_enqueue_style('font-awesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');
 }
 add_action('wp_enqueue_scripts', 'steam_load_font_awesome');
+
+
+// Marketplace Listing from Steam
+function marketplace_listing_shortcode_handler($atts)
+{
+    // Define default values for attributes
+    $default_atts = array(
+        'count' => 100,
+        'category' => '',
+    );
+
+    // Merge user-provided attributes with defaults
+    $atts = shortcode_atts($default_atts, $atts, 'steam_listing');
+
+    // Pass PHP variables to JavaScript
+    wp_localize_script('steam-marketplace-listing-shortcode-script', 'steamListingData', $atts);
+    include STEAM_PLUGIN_PATH . '/includes/templates/steam-marketplace-listing.php';
+}
+
+// Register the Steam Marketplace Listing shortcode
+add_shortcode('steam_listing', 'marketplace_listing_shortcode_handler');
+
+
+function steam_marketplace_enqueue_css()
+{
+    if ((has_shortcode(get_the_content(), 'steam_listing'))) {
+        $steamSkinsListing = STEAM_PLUGIN_URL . 'includes/assets/css/listing.css';
+        wp_register_style('steam-skin-Listing', $steamSkinsListing, array(), '1.0.0');
+
+        wp_enqueue_style('steam-skin-Listing');
+    }
+}
+add_action('wp_enqueue_scripts', 'steam_marketplace_enqueue_css', 100);
+
+function steam_marketplace_listing_js()
+{
+    // Check if we are on a single page
+    if ((has_shortcode(get_the_content(), 'steam_listing'))) {
+        // Define the PHP variables you want to pass
+        // $php_data = array(
+        //     'consumerKey'   => get_plugin_options_crp('woo_consumer_key'),
+        //     'consumerSecret'      => get_plugin_options_crp('woo_consumer_secret'),
+        // );
+
+
+        wp_enqueue_script(
+            'steam-marketplace-listing-shortcode-script',
+            STEAM_PLUGIN_URL . 'includes/assets/js/steam-market-listing.js',
+            array(),
+            '1.0.0',
+            true
+        );
+    }
+}
+
+add_action('wp_enqueue_scripts', 'steam_marketplace_listing_js');

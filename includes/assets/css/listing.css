@@ -1,0 +1,56 @@
+/* Skin Card Styling */
+.skin-card {
+  background-color: #282a36;
+  text-align: center;
+  border-radius: 10px;
+  text-decoration: none !important;
+  padding: 15px;
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.4);
+  transition: transform 0.2s;
+}
+
+.steam-link {
+  text-decoration: none !important;
+}
+
+.skin-card:hover {
+  transform: translateY(-10px);
+}
+
+.skin-card img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.skin-name {
+  font-size: 14px;
+  margin: 10px 0;
+  text-decoration: none !important;
+  color: white;
+}
+
+.skin-price {
+  color: #ffc107;
+  font-size: 18px;
+  font-weight: bold;
+  text-decoration: none !important;
+}
+
+/* Shimmer Effect */
+.shimmer {
+  display: block;
+  height: 250px;
+  background: linear-gradient(90deg, #2a2d3a 25%, #3c3f4d 50%, #2a2d3a 75%);
+  background-size: 200% 100%;
+  animation: shimmerAnimation 1.5s infinite;
+  border-radius: 10px;
+}
+
+@keyframes shimmerAnimation {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
