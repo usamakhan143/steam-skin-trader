@@ -127,14 +127,7 @@ add_action('wp_enqueue_scripts', 'steam_marketplace_enqueue_css', 100);
 
 function steam_marketplace_listing_js()
 {
-    // Check if we are on a single page
     if ((has_shortcode(get_the_content(), 'steam_listing'))) {
-        // Define the PHP variables you want to pass
-        // $php_data = array(
-        //     'consumerKey'   => get_plugin_options_crp('woo_consumer_key'),
-        //     'consumerSecret'      => get_plugin_options_crp('woo_consumer_secret'),
-        // );
-
 
         wp_enqueue_script(
             'steam-marketplace-listing-shortcode-script',
