@@ -105,13 +105,24 @@ function marketplace_listing_shortcode_handler($atts)
     // Merge user-provided attributes with defaults
     $atts = shortcode_atts($default_atts, $atts, 'steam_listing');
 
+    // Generate a unique container ID for this shortcode instance
+    $container_id = 'skins_container_' . uniqid();
+
+    // Add the container ID to the attributes
+    $atts['container_id'] = $container_id;
+
     // Pass PHP variables to JavaScript
-    wp_localize_script('steam-marketplace-listing-shortcode-script', 'steamListingData', $atts);
+    wp_localize_script('steam-marketplace-listing-shortcode-script', 'steamListingData_' . $container_id, $atts);
+
+    // Include the template
+    ob_start();
     include STEAM_PLUGIN_PATH . '/includes/templates/steam-marketplace-listing.php';
+    return ob_get_clean();
 }
 
 // Register the Steam Marketplace Listing shortcode
 add_shortcode('steam_listing', 'marketplace_listing_shortcode_handler');
+
 
 
 function steam_marketplace_enqueue_css()

@@ -1,6 +1,7 @@
-function fetchSteamMarketData(cat) {
-  const $skinsContainer = $("#skins-container");
-  const numOfResults = steamListingData.count;
+function fetchSteamMarketData(containerId, cat, count) {
+  const $skinsContainer = $("#" + containerId);
+  const numOfResults = count;
+
   $.ajax({
     url: `https://steamcommunity.com/market/search/render/?appid=730&norender=1&count=${numOfResults}`,
     method: "GET",
@@ -20,25 +21,25 @@ function fetchSteamMarketData(cat) {
           const itemName = skin?.name || ""; // Fallback to empty string
           if (itemName.includes(cat)) {
             const skinCard = `
-                        <div class="col-6 col-md-4 col-lg-2">
-                            <a href="https://steamcommunity.com/market/listings/730/${
-                              skin.asset_description?.market_hash_name || "#"
-                            }" target="_blank" class="steam-link">
-                                <div class="skin-card">
-                                    <img src="https://community.cloudflare.steamstatic.com/economy/image/${
-                                      skin.asset_description?.icon_url || ""
-                                    }" alt="${itemName}">
-                                    <div class="skin-name">${truncateString(
-                                      itemName,
-                                      13
-                                    )}</div>
-                                    <div class="skin-price">${
-                                      skin.sell_price_text || "N/A"
-                                    }</div>
-                                </div>
-                            </a>
-                        </div>
-                    `;
+                          <div class="col-6 col-md-4 col-lg-2">
+                              <a href="https://steamcommunity.com/market/listings/730/${
+                                skin.asset_description?.market_hash_name || "#"
+                              }" target="_blank" class="steam-link">
+                                  <div class="skin-card">
+                                      <img src="https://community.cloudflare.steamstatic.com/economy/image/${
+                                        skin.asset_description?.icon_url || ""
+                                      }" alt="${itemName}">
+                                      <div class="skin-name" title="${itemName}">${truncateString(
+              itemName,
+              13
+            )}</div>
+                                      <div class="skin-price">${
+                                        skin.sell_price_text || "N/A"
+                                      }</div>
+                                  </div>
+                              </a>
+                          </div>
+                      `;
             $skinsContainer.append(skinCard);
           }
         });
@@ -66,6 +67,18 @@ function truncateString(str, limit) {
 
 // Call the function on page load
 $(document).ready(function () {
-  const category = steamListingData.category;
-  fetchSteamMarketData(category);
+  $(".skins-container").each(function () {
+    const containerId = $(this).attr("id");
+    const steamListingKey = `steamListingData_${containerId}`;
+    const listingData = window[steamListingKey]; // Fetch dynamic localized data
+
+    if (!listingData) {
+      console.error(`No data found for container: ${containerId}`);
+      return;
+    }
+
+    const category = listingData.category;
+    const resultCount = listingData.count;
+    fetchSteamMarketData(containerId, category, resultCount);
+  });
 });
