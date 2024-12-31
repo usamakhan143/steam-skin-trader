@@ -1,9 +1,13 @@
 function fetchSteamMarketData(containerId, cat, count) {
   const $skinsContainer = $("#" + containerId);
-  const numOfResults = count;
+  let numOfResults = count;
+  let baseUrl =
+    window.location.host === "localhost"
+      ? `${window.location.origin}/wpplugindev/`
+      : window.location.origin;
 
   $.ajax({
-    url: `https://steamcommunity.com/market/search/render/?appid=730&norender=1&count=${numOfResults}`,
+    url: `${baseUrl}/wp-json/custom-proxy/v1/steam-market?count=${numOfResults}`,
     method: "GET",
     success: function (response) {
       try {
@@ -67,18 +71,25 @@ function truncateString(str, limit) {
 
 // Call the function on page load
 $(document).ready(function () {
-  $(".skins-container").each(function () {
-    const containerId = $(this).attr("id");
-    const steamListingKey = `steamListingData_${containerId}`;
-    const listingData = window[steamListingKey]; // Fetch dynamic localized data
+  if (!Array.isArray(steamListingData)) {
+    console.error("No data available for Steam listings.");
+    return;
+  }
 
-    if (!listingData) {
-      console.error(`No data found for container: ${containerId}`);
+  // Iterate over each shortcode instance
+  steamListingData.forEach((listingData) => {
+    const containerId = listingData.container_id;
+    const category = listingData.category;
+    const resultCount = parseInt(listingData.count, 10);
+
+    // Ensure the container exists
+    const container = $(`#${containerId}`);
+    if (!container.length) {
+      console.error(`Container not found: ${containerId}`);
       return;
     }
 
-    const category = listingData.category;
-    const resultCount = listingData.count;
+    // Fetch and display the data
     fetchSteamMarketData(containerId, category, resultCount);
   });
 });

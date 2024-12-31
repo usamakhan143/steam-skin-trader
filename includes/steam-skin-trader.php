@@ -111,8 +111,12 @@ function marketplace_listing_shortcode_handler($atts)
     // Add the container ID to the attributes
     $atts['container_id'] = $container_id;
 
-    // Pass PHP variables to JavaScript
-    wp_localize_script('steam-marketplace-listing-shortcode-script', 'steamListingData_' . $container_id, $atts);
+    // Store data in a global array for all shortcode instances
+    global $steam_listing_data;
+    if (!isset($steam_listing_data)) {
+        $steam_listing_data = [];
+    }
+    $steam_listing_data[] = $atts;
 
     // Include the template
     ob_start();
@@ -120,8 +124,19 @@ function marketplace_listing_shortcode_handler($atts)
     return ob_get_clean();
 }
 
+// Hook to localize all data before rendering the page
+add_action('wp_footer', function () {
+    global $steam_listing_data;
+
+    // If data exists, pass it to JavaScript
+    if (!empty($steam_listing_data)) {
+        wp_localize_script('steam-marketplace-listing-shortcode-script', 'steamListingData', $steam_listing_data);
+    }
+});
+
 // Register the Steam Marketplace Listing shortcode
 add_shortcode('steam_listing', 'marketplace_listing_shortcode_handler');
+
 
 
 
@@ -151,3 +166,38 @@ function steam_marketplace_listing_js()
 }
 
 add_action('wp_enqueue_scripts', 'steam_marketplace_listing_js');
+
+
+
+// Steam Market API Developed From Own Server
+add_action('rest_api_init', function () {
+    register_rest_route('custom-proxy/v1', '/steam-market', array(
+        'methods' => 'GET',
+        'callback' => 'fetch_steam_market_data',
+        'args' => array(
+            'count' => array(
+                'required' => false,
+                'default' => 100,
+                'validate_callback' => function ($param) {
+                    return is_numeric($param) && $param > 0;
+                },
+            ),
+        ),
+    ));
+});
+
+function fetch_steam_market_data($data)
+{
+    $count = $data['count']; // Retrieve the count parameter
+    $api_url = "https://steamcommunity.com/market/search/render/?appid=730&norender=1&count={$count}";
+
+    $response = wp_remote_get($api_url);
+
+    if (is_wp_error($response)) {
+        return new WP_Error('api_error', 'Unable to fetch data', array('status' => 500));
+    }
+
+    $body = wp_remote_retrieve_body($response);
+
+    return rest_ensure_response(json_decode($body));
+}
