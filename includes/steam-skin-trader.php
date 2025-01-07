@@ -2,6 +2,14 @@
 
 function steam_login_enqueue_scripts()
 {
+    wp_enqueue_script(
+        'steam-skin-trader-utilities', // Handle name for your script
+        STEAM_PLUGIN_URL . 'includes/assets/js/utilities.js', // Path to your custom jQuery file
+        array(), // Dependencies, leave empty if none
+        '1.0.0', // Version number, update as needed
+        true // Load in the footer
+    );
+
     // Enqueue Styles
     wp_enqueue_style(
         'steam-skin-trader-bootstrap5',
@@ -142,7 +150,7 @@ add_shortcode('steam_listing', 'marketplace_listing_shortcode_handler');
 
 function steam_marketplace_enqueue_css()
 {
-    if ((has_shortcode(get_the_content(), 'steam_listing'))) {
+    if ((has_shortcode(get_the_content(), 'steam_listing')) || (has_shortcode(get_the_content(), 'steam_my_items'))) {
         $steamSkinsListing = STEAM_PLUGIN_URL . 'includes/assets/css/listing.css';
         wp_register_style('steam-skin-Listing', $steamSkinsListing, array(), '1.0.0');
 
@@ -190,6 +198,63 @@ function fetch_steam_market_data($data)
 {
     $count = $data['count']; // Retrieve the count parameter
     $api_url = "https://steamcommunity.com/market/search/render/?appid=730&norender=1&count={$count}";
+
+    $response = wp_remote_get($api_url);
+
+    if (is_wp_error($response)) {
+        return new WP_Error('api_error', 'Unable to fetch data', array('status' => 500));
+    }
+
+    $body = wp_remote_retrieve_body($response);
+
+    return rest_ensure_response(json_decode($body));
+}
+
+// Create a shortcode for logged in user Items. 
+function steam_loggedin_user_inventory()
+{
+    include STEAM_PLUGIN_PATH . '/includes/templates/steam-loggedin-user-inventory.php';
+}
+add_shortcode('steam_my_items', 'steam_loggedin_user_inventory');
+
+function steam_loginuser_inventory_items_js()
+{
+    if ((has_shortcode(get_the_content(), 'steam_my_items'))) {
+
+        wp_enqueue_script(
+            'steam-loggedin-useritems-shortcode-script',
+            STEAM_PLUGIN_URL . 'includes/assets/js/steam-loggedin-user-inventory.js',
+            array(),
+            '1.0.0',
+            true
+        );
+    }
+}
+
+add_action('wp_enqueue_scripts', 'steam_loginuser_inventory_items_js');
+
+
+// Steam User Inventory API Developed From Own Server
+add_action('rest_api_init', function () {
+    register_rest_route('custom-proxy/v1', '/steam-user-items', array(
+        'methods' => 'GET',
+        'callback' => 'fetch_steam_user_items',
+        'args' => array(
+            'userid' => array(
+                'required' => true,
+                'default' => 0,
+                'validate_callback' => function ($param) {
+                    return is_numeric($param) && $param > 0;
+                },
+            ),
+        ),
+    ));
+});
+
+function fetch_steam_user_items($data)
+{
+    $steamId = $data['userid']; // Retrieve the count parameter
+    $api_url = "https://steamcommunity.com/inventory/{$steamId}/730/2?l=english&count=5000";
 
     $response = wp_remote_get($api_url);
 

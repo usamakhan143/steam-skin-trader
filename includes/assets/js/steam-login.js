@@ -14,15 +14,6 @@ jQuery(document).ready(function ($) {
       "&openid.claimed_id=http://specs.openid.net/auth/2.0/identifier_select";
   });
 
-  // Function to get cookie by name
-  function getCookie(name) {
-    let match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-    if (match) {
-      return match[2];
-    }
-    return null;
-  }
-
   // Function to delete a cookie by name
   function deleteCookie(name) {
     document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
